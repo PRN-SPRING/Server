@@ -8,10 +8,10 @@
         Title="Chat Server" Height="450" Width="800">
     <Grid>
         <ListBox Name="MessageList" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="10,10,10,100" />
-        <TextBox Name="PortInput" VerticalAlignment="Top" Margin="142,349,413,0" Height="30" TextChanged="PortInput_TextChanged" />
+        <TextBox Name="PortInput" VerticalAlignment="Top" Margin="139,331,416,0" Height="30" TextChanged="PortInput_TextChanged" />
         <TextBox Name="MessageInput" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Margin="10,40,120,10" Height="30" />
         <Button Content="Send Message" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="130,10,10,10" Width="100" Click="SendMessageButton_Click" />
-        <Button Content="Start Server" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,300,55" Width="100" Click="StartServerButton_Click" />
-        <TextBlock HorizontalAlignment="Left" Margin="35,353,0,0" TextWrapping="Wrap" Text="Enter Port" VerticalAlignment="Top" Width="78"/>
+        <Button Content="Start Server" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,300,54" Width="100" Click="StartServerButton_Click" />
+        <TextBlock HorizontalAlignment="Left" Margin="44,338,0,0" TextWrapping="Wrap" Text="Enter Port" VerticalAlignment="Top" Width="78"/>
     </Grid>
 </Window>
