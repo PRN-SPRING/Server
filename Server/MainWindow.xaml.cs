@@ -118,7 +118,7 @@ namespace Server
             {
                 Task.Run(() =>
                 {
-                    string host = "127.0.0.1";
+                    string host = "192.168.43.20";
                     ExecuteServer(host, port);
                 });
             }
@@ -156,33 +156,88 @@ namespace Server
             }
         }
 
+        //private void ProcessMessage(object parm)
+        //{
+        //    string data;
+        //    int count;
+        //    try
+        //    {
+        //        TcpClient client = parm as TcpClient;
+        //        byte[] bytes = new byte[256];
+        //        NetworkStream stream = client.GetStream();
+        //        while ((count = stream.Read(bytes, 0, bytes.Length)) != 0)
+        //        {
+        //            data = Encoding.ASCII.GetString(bytes, 0, count);
+        //            LogMessage($"Received: {data}");
+        //            data = data.ToUpper();
+        //            byte[] msg = Encoding.ASCII.GetBytes(data);
+        //            stream.Write(msg, 0, msg.Length);
+        //            LogMessage($"Sent: {data}");
+        //        }
+        //        lock (connectedClients)
+        //        {
+        //            connectedClients.Remove(client);
+        //        }
+        //        client.Close();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        LogMessage($"Error: {ex.Message}");
+        //    }
+        //}
         private void ProcessMessage(object parm)
         {
             string data;
             int count;
+            TcpClient senderClient = parm as TcpClient;
+
             try
             {
-                TcpClient client = parm as TcpClient;
                 byte[] bytes = new byte[256];
-                NetworkStream stream = client.GetStream();
-                while ((count = stream.Read(bytes, 0, bytes.Length)) != 0)
+                NetworkStream senderStream = senderClient.GetStream();
+
+                while ((count = senderStream.Read(bytes, 0, bytes.Length)) != 0)
                 {
                     data = Encoding.ASCII.GetString(bytes, 0, count);
-                    LogMessage($"Received: {data}");
-                    data = data.ToUpper();
-                    byte[] msg = Encoding.ASCII.GetBytes(data);
-                    stream.Write(msg, 0, msg.Length);
-                    LogMessage($"Sent: {data}");
+                    LogMessage($"Received from client: {data}");
+
+                    // Broadcast to all other connected clients
+                    lock (connectedClients)
+                    {
+                        foreach (var client in connectedClients)
+                        {
+                            if (client != senderClient) // Don't send the message back to the sender
+                            {
+                                try
+                                {
+                                    NetworkStream stream = client.GetStream();
+                                    byte[] msg = Encoding.ASCII.GetBytes(data);
+                                    stream.Write(msg, 0, msg.Length);
+                                }
+                                catch (Exception ex)
+                                {
+                                    LogMessage($"Error sending to a client: {ex.Message}");
+                                }
+                            }
+                        }
+                    }
+
+                    LogMessage($"Broadcasted: {data}");
                 }
+
+            }
+            //catch (Exception ex)
+            //{
+            //    LogMessage($"Error: {ex.Message}");
+            //}
+            finally
+            {
                 lock (connectedClients)
                 {
-                    connectedClients.Remove(client);
+                    connectedClients.Remove(senderClient);
                 }
-                client.Close();
-            }
-            catch (Exception ex)
-            {
-                LogMessage($"Error: {ex.Message}");
+                senderClient.Close();
+                LogMessage("Client Disconnect");
             }
         }
 
